@@ -19,7 +19,7 @@ class CustomerService(val customerRepository: CustomerRespository) {
         this.customerRepository.save(customer)
     }
 
-    fun getCustomer(@PathVariable id: Long): CustomerModel {
+    fun getById(@PathVariable id: Long): CustomerModel {
         return this.customerRepository.findById(id).orElseThrow()
     }
 
