@@ -1,6 +1,8 @@
 package app.localhost.mercadolivro.models
 
 import app.localhost.mercadolivro.enuns.BookStatus
+import app.localhost.mercadolivro.enuns.Errors
+import app.localhost.mercadolivro.exceptions.BadRequestException
 import java.math.BigDecimal
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -30,7 +32,7 @@ class BookModel(
     var status: BookStatus? = null
         set(value) {
             if (field == BookStatus.CANCELED || field == BookStatus.DELETED) {
-                throw Exception("Não é possivel alterar um livro com status $field")
+                throw BadRequestException(message = Errors.ML102.message, errorCode = Errors.ML102.code)
             }
             field = value
         }
