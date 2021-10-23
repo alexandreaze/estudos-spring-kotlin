@@ -1,5 +1,6 @@
 package app.localhost.mercadolivro.services
 
+import app.localhost.mercadolivro.enuns.CustomerStatus
 import app.localhost.mercadolivro.models.CustomerModel
 import app.localhost.mercadolivro.repositories.CustomerRespository
 import org.springframework.stereotype.Service
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 
 @Service
-class CustomerService(val customerRepository: CustomerRespository) {
+class CustomerService(val customerRepository: CustomerRespository, val bookService: BookService) {
     val custormers = mutableListOf<CustomerModel>()
 
     fun getAll(@RequestParam name: String?): List<CustomerModel> {
@@ -31,7 +32,10 @@ class CustomerService(val customerRepository: CustomerRespository) {
         return customer
     }
 
-    fun deleteCustomer(@PathVariable id: Long) {
-        return this.customerRepository.deleteById(id)
+    fun deleteCustomer(@PathVariable id: Long): CustomerModel {
+        val customer = this.getById(id)
+        this.bookService.deleteByCustomer(customer)
+        customer.status = CustomerStatus.INACTIVE
+        return this.customerRepository.save(customer)
     }
 }

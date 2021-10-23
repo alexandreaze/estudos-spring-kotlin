@@ -21,10 +21,49 @@ class BookModel(
     var name: String,
     @Column
     var price: BigDecimal,
-    @Column
-    @Enumerated(EnumType.STRING)
-    var status: BookStatus? = null,
     @ManyToOne
     @JoinColumn(name = "customer_id")
     var customer: CustomerModel? = null
-)
+) {
+    @Column
+    @Enumerated(EnumType.STRING)
+    var status: BookStatus? = null
+        set(value) {
+            if (field == BookStatus.CANCELED || field == BookStatus.DELETED) {
+                throw Exception("Não é possivel alterar um livro com status $field")
+            }
+            field = value
+        }
+
+    constructor(
+        id: Long? = null,
+        price: BigDecimal,
+        customer: CustomerModel? = null,
+        status: BookStatus?,
+        name: String
+    ) : this(id, name, price, customer) {
+        this.status = status
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BookModel) return false
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (price != other.price) return false
+        if (customer != other.customer) return false
+        if (status != other.status) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id?.hashCode() ?: 0
+        result = 31 * result + name.hashCode()
+        result = 31 * result + price.hashCode()
+        result = 31 * result + (customer?.hashCode() ?: 0)
+        result = 31 * result + (status?.hashCode() ?: 0)
+        return result
+    }
+}
